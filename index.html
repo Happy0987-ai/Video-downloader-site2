@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>YouTube Video Viewer & Info</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+      min-height: 100vh;
+      margin:0;
+      display: flex; 
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    h1 {
+      margin-bottom: 1rem;
+    }
+    input[type="url"] {
+      width: 100%;
+      max-width: 500px;
+      padding: 0.8rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: none;
+      margin-bottom: 1rem;
+    }
+    button {
+      background-color: #ff0000;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #cc0000;
+    }
+    #playerContainer {
+      margin-top: 2rem;
+      width: 100%;
+      max-width: 560px;
+      aspect-ratio: 16 / 9;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    #downloadLinks {
+      margin-top: 1rem;
+    }
+    a {
+      color: #ffd700;
+      text-decoration: none;
+      display: block;
+      margin: 0.4rem 0;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    #error {
+      color: #ff6666;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>YouTube Video Viewer & Info</h1>
+  <input id="videoUrl" type="url" placeholder="Enter YouTube video URL" />
+  <button id="loadBtn">Load Video</button>
+  <div id="error"></div>
+  <div id="playerContainer" hidden>
+    <iframe id="youtubePlayer" allowfullscreen></iframe>
+  </div>
+  <div id="downloadLinks" hidden>
+    <h3>External Download Options (Authorized Sites)</h3>
+    <a href="#" target="_blank" rel="noopener noreferrer" id="yt1">yt1s.com - YouTube Downloader</a>
+    <a href="#" target="_blank" rel="noopener noreferrer" id="savefrom">savefrom.net - YouTube Downloader</a>
+    <a href="#" target="_blank" rel="noopener noreferrer" id="y2mate">y2mate.com - YouTube Downloader</a>
+  </div>
+
+  <script>
+    const input = document.getElementById('videoUrl');
+    const loadBtn = document.getElementById('loadBtn');
+    const playerContainer = document.getElementById('playerContainer');
+    const youtubePlayer = document.getElementById('youtubePlayer');
+    const downloadLinks = document.getElementById('downloadLinks');
+    const errorDiv = document.getElementById('error');
+
+    function extractYouTubeID(url) {
+      try {
+        const u = new URL(url);
+        if (u.hostname === 'youtu.be') {
+          return u.pathname.slice(1);
+        } else if (
+          u.hostname === 'www.youtube.com' || 
+          u.hostname === 'youtube.com' || 
+          u.hostname === 'm.youtube.com'
+        ) {
+          return u.searchParams.get('v');
+        }
+        return null;
+      } catch {
+        return null;
+      }
+    }
+
+    loadBtn.addEventListener('click', () => {
+      errorDiv.textContent = '';
+      const url = input.value.trim();
+      if (!url) {
+        errorDiv.textContent = 'Please enter a YouTube video URL.';
+        return;
+      }
+      const videoID = extractYouTubeID(url);
+      if (!videoID) {
+        errorDiv.textContent = 'Invalid YouTube video URL.';
+        return;
+      }
+
+      // Embed the video
+      youtubePlayer.src = `https://www.youtube.com/embed/${videoID}`;
+      playerContainer.hidden = false;
+
+      // Update external downloader links
+      document.getElementById('yt1').href = `https://yt1s.com/en68?url=https://www.youtube.com/watch?v=${videoID}`;
+      document.getElementById('savefrom').href = `https://en.savefrom.net/1-youtube-video-downloader-4/?url=https://www.youtube.com/watch?v=${videoID}`;
+      document.getElementById('y2mate').href = `https://www.y2mate.com/youtube/${videoID}`;
+      downloadLinks.hidden = false;
+    });
+  </script>
+</body>
+</html>
